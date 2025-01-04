@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        html {
+            touch-action:none;
+        }
+
+        .player {
+            position:absolute;
+            height:180px;
+            width:180px;
+            background-color: #FFFFFFc4;
+            transform:translate(-90px, -90px);
+            border-radius:50%;
+        }
+
+        .iorumba {
+            background-color: #84366a
+        }
+        .nordica {
+            background-color: #4a8934
+        }
+        .grega {
+            background-color: #406999
+        }
+        .crista {
+            background-color: #f01317
+        }
+        .egipcia {
+            background-color: #feab19
+        }
+        .first {
+            border: #cea514 30px solid;
+            transform:translate(-120px, -120px);
+        }
+
+        #setup {
+
+        }
+
+        .show {
+            display: block;
+        }
+        .hide{
+            display: none;
+        }
+        .faith{
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            font-size: 150px;
+        }
+    </style>
+</head>
+<body>
+   <div>
+    <button id="bt-setup">setup</button>
+    <button id="bt-cartela">valor de fé</button>
+   </div>
+   <div id="cartela" class="hide">
+    <div><button class="bt-prev"><</button><span class="playerType"></span><button class="bt-next">></button></div>
+    <div id="cartela-content">
+        <div>
+            <button class="bt-minus" style="width: 20%;">-</button>
+            <button class="bt-reset" style="width: 20%; margin: 0 18%;">reset</button>
+            <button class="bt-more" style="width: 20%;">+</button>
+        </div>
+        <span class="faith">0</span>
+    </div>
+   </div>
+    <div id="setup" style="height:600px; background-color: #0000ff" onTouchStart="handleOnClick(event)" onTouchEnd="handleOnEnd(event)" onTouchMove="handleOnMove(event)">
+    Cada Jogador coloca 1 dedo sobre a tela, em 2s será indicado qual sua fé e quam será o primeiro jogador
+    </div>
+      <script>
+        const target = document.querySelector("#setup");
+        var timeout;
+        var touches;
+
+function handleOnClick(e) {
+    const touch = e.changedTouches[0];
+    console.log('click', e);
+    console.log(touch.pageY, touch.pageX);
+    touches = e.touches;
+    const el = document.createElement("div");
+    el.id = "p"+ touch.identifier;
+    el.className = "player";
+    el.style.cssText = "top:"+touch.pageY+"px; left:"+touch.pageX+"px;";
+
+    target.append(el);
+    setStart();
+  }
+
+  function handleOnMove(e) {
+    const touch = e.touches;
+    console.log('clmoveick', e);
+    console.log(touch.pageY, touch.pageX);
+    for(const t of e.touches){
+        const el = document.getElementById("p" + t.identifier);
+        el.style.cssText = "top:"+t.pageY+"px; left:"+t.pageX+"px;";
+    }
+  }
+
+  function handleOnEnd(e) {
+    const touch = e.changedTouches[0];
+    touches = e.touches;
+    console.log('end', e);
+    const el = document.getElementById("p" + touch.identifier);
+    el.remove();
+    setStart();
+  }
+
+  function setStart(){
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+        const playersType = ["iorumba", "nordica", "grega", "crista", "egipcia"];
+
+        var i = 0;
+        for(const t of touches){
+            const el = document.getElementById("p" + t.identifier);
+            el.classList.add(playersType[i++]);
+        }
+        const el = document.getElementById("p" + touches[0].identifier);
+        el.classList.add("first");
+
+    }, 2000);
+  }
+
+  const playersType = ["iorumba", "nordica", "grega", "crista", "egipcia"];
+  let playerIndex = 0;
+  let faith = 0;
+
+  function setPlayer(index){
+    const t = document.querySelector(".playerType");
+    const content = document.querySelector("#cartela-content");
+    t.innerHTML = playersType[index];
+    
+    content.className = playersType[index];
+    playerIndex = index;
+  }
+
+  function setFaith(f){
+    const t = document.querySelector(".faith");
+    t.innerHTML = f;
+    faith = f;
+  }
+
+  setPlayer(playerIndex);
+
+  const btsetup = document.querySelector("#bt-setup");
+  const btcartela = document.querySelector("#bt-cartela");
+  const setup = document.querySelector("#setup");
+  const cartela = document.querySelector("#cartela");
+  const btNext = document.querySelector("#cartela .bt-prev");
+  const btPrev = document.querySelector("#cartela .bt-next");
+  const btMinus = document.querySelector("#cartela .bt-minus");
+  const btReset = document.querySelector("#cartela .bt-reset");
+  const btMore = document.querySelector("#cartela .bt-more");
+
+  btsetup.addEventListener("click", ()=>{
+    setup.classList.remove("hide");
+    cartela.classList.add("hide");
+  });
+  btcartela.addEventListener("click", ()=>{
+    cartela.classList.remove("hide");
+    setup.classList.add("hide");
+  })
+  btNext.addEventListener("click", ()=>{
+    setPlayer(playerIndex < 4 ? playerIndex + 1 : 0);
+  });
+  btPrev.addEventListener("click", ()=>{
+    setPlayer(playerIndex > 0 ? playerIndex - 1 : 4);
+  });
+  btMinus.addEventListener("click", ()=>{
+    setFaith(faith - 1);
+  });
+  btReset.addEventListener("click", ()=>{
+    setFaith(0);
+  });
+  btMore.addEventListener("click", ()=>{
+    setFaith(faith + 1);
+  });
+    </script>
+</body>
+</html>
